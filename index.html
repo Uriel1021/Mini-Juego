@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3b165e">
+  <meta name="description" content="Una pequeña aventura de amor hecha especialmente para ti.">
+  <title>Un universo para ti ✦</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {--ink:#251343;--dark:#35124f;--purple:#642394;--pink:#ff91d1;--cyan:#9bf6ff;--white:#fff3ff;--yellow:#fff18a;--edge:#ffe6ff;--bg:#35124f}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:'VT323',monospace;background:var(--bg);color:var(--white)}
+    body{min-height:100dvh;overflow-x:hidden}
+    #world{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0}
+    .vignette{position:fixed;inset:0;pointer-events:none;z-index:0;background:linear-gradient(180deg,rgba(35,5,71,.12) 0%,transparent 36%,rgba(17,4,38,.29) 100%)}
+    .wrap{position:relative;z-index:1;display:flex;min-height:100dvh;flex-direction:column;padding:19px clamp(12px,4vw,32px) 18px}
+    .topbar{width:min(1050px,100%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.2vw,11px);line-height:1.65;color:#ffeb9f;text-shadow:2px 2px #462367;letter-spacing:.3px}
+    .top-actions{display:flex;align-items:center;gap:8px}
+    button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    button:focus-visible{outline:3px solid #9efaff;outline-offset:5px}
+    .iconbtn{border:2px solid rgba(255,232,255,.78);background:#481d74c7;color:#fff;min-width:38px;height:38px;padding:0 9px;font:23px 'VT323',monospace;box-shadow:3px 3px 0 #260b44;transition:transform .16s}
+    .iconbtn:hover{transform:translateY(-2px)}
+    main{flex:1;display:grid;place-items:center;width:100%}
+    .screen{width:min(780px,100%);margin:26px auto;animation:appear .35s ease-out both}
+    .screen[hidden]{display:none!important}
+    @keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .hero{text-align:center;display:flex;flex-direction:column;align-items:center;padding:29px 12px 15px}
+    .eyebrow{color:var(--cyan);font:clamp(8px,1.4vw,11px)/1.9 'Press Start 2P',monospace;letter-spacing:.4px;text-shadow:2px 3px #46195d}
+    .headline{font:clamp(19px,4.3vw,38px)/1.6 'Press Start 2P',monospace;color:#fff0a7;max-width:850px;text-shadow:4px 4px 0 #8f398e,-2px -2px 0 #8f398e,0 6px 0 #492057;margin:20px 0 7px}
+    .lead{font-size:clamp(23px,3.1vw,32px);text-shadow:2px 2px #4d2162;max-width:600px;line-height:1.16;margin:8px auto 27px}
+    .floatheart{display:block;font-size:46px;line-height:1;filter:drop-shadow(4px 5px #7c245d);animation:heartBeat 2s ease-in-out infinite;margin-bottom:7px}
+    @keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+    .menu{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;width:100%}
+    .menu-btn{width:clamp(112px,22vw,169px);min-height:144px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#4c207be0;color:#fff;border:3px solid #f9b5f4;box-shadow:0 0 0 3px #431564,6px 6px 0 #260739;transition:transform .18s,background .18s}
+    .menu-btn:hover{transform:translateY(-6px);background:#702b9d}
+    .menu-btn svg{width:57px;height:57px;image-rendering:pixelated;filter:drop-shadow(3px 4px 0 rgba(43,6,56,.4))}
+    .menu-btn strong{font:10px/1.7 'Press Start 2P',monospace;color:#fff6b5}
+    .menu-btn small{font-size:21px;line-height:.8;color:#f5d8ff}
+    .menu-btn.locked{opacity:.8}
+    .micro{font-size:20px;text-align:center;text-shadow:1px 2px #46225e;color:#ffe0f9;margin-top:22px}
+    footer{font:clamp(14px,2vw,19px)/1.3 'VT323',monospace;text-align:center;color:#ffe5fc;text-shadow:2px 2px #351052;padding-top:9px}
+    .panel{width:min(720px,100%);margin:auto;background:rgba(50,16,89,.84);border:3px solid #ffb5ef;box-shadow:0 0 0 4px #4b1b73,9px 9px 0 #280f42;padding:clamp(15px,3vw,28px);backdrop-filter:blur(4px)}
+    .panel-title{font:clamp(10px,2.4vw,17px)/1.7 'Press Start 2P',monospace;color:var(--cyan);text-shadow:2px 3px #481f75;text-align:center;margin:0 0 16px}
+    .letter{background:#fff1ee;color:#503157;border:6px solid #fbcbd7;outline:3px solid #66337e;box-shadow:7px 7px 0 #321546;padding:clamp(22px,5vw,40px);min-height:300px;max-width:580px;margin:23px auto 20px;position:relative;transform:rotate(-1deg)}
+    .letter:before,.letter:after{content:'✦';position:absolute;font-size:24px;color:#df76a9}.letter:before{top:6px;right:12px}.letter:after{bottom:6px;left:12px}
+    .letter .date{font:16px 'VT323',monospace;text-align:right;color:#ad7192;margin:0}
+    .letter h3{font:clamp(13px,2vw,16px)/1.65 'Press Start 2P',monospace;color:#a63f85;margin:15px 0}
+    .letter p{font-size:clamp(25px,3.4vw,31px);line-height:1.17;margin:12px 0;min-height:138px}
+    .letter .signature{font-size:23px;color:#b25297;text-align:right;margin-top:20px}
+    .actions{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap;margin:20px auto 3px}
+    .pixel-btn{border:3px solid #fff0fe;background:#a441b4;color:#fff;font:clamp(9px,1.6vw,12px)/1.65 'Press Start 2P',monospace;padding:14px 17px;box-shadow:4px 4px 0 #37134f;transition:transform .15s,background .15s;min-height:47px}
+    .pixel-btn:hover:not(:disabled){transform:translateY(-3px);background:#cf58bd}
+    .pixel-btn.primary{background:#ff8bb8;color:#41194c;border-color:#fff4d4}.pixel-btn.primary:hover{background:#ffb8cd}
+    .pixel-btn:disabled{opacity:.55;cursor:not-allowed}
+    .small-note{text-align:center;color:#ffebfc;font-size:22px;margin:8px 0}
+    .hud{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 20px;font:23px 'VT323',monospace;margin-bottom:12px}
+    .hud strong{color:#fff69c;font-size:26px}
+    .progress{background:#2a104c;border:2px solid #ffc5f7;height:14px;margin:0 0 13px;padding:2px}
+    .progress-inner{background:linear-gradient(90deg,#ff6fa7,#ffe895);height:100%;width:0%;transition:width .35s}
+    .playfield{position:relative;height:clamp(290px,47vh,390px);border:3px solid #bdf3ff;box-shadow:inset 0 0 0 3px rgba(53,18,93,.62),5px 5px 0 #301347;background:rgba(72,20,106,.24);overflow:hidden;isolation:isolate}
+    .playfield:before{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(#fbeafa 1.2px,transparent 1.2px),radial-gradient(#ffffff99 1px,transparent 1px);background-size:61px 54px,87px 93px;background-position:11px 10px,41px 33px;opacity:.65}
+    .orb{position:absolute;width:44px;height:44px;border:0;background:none;padding:3px;display:grid;place-items:center;transform:translate(-50%,-50%);transition:filter .13s,opacity .18s;animation:bob var(--dur,2.3s) ease-in-out infinite alternate;animation-delay:var(--delay,0s)}
+    .orb svg{width:36px;height:36px;image-rendering:pixelated;filter:drop-shadow(3px 4px 0 #351347)}
+    .orb:hover:not(:disabled){filter:brightness(1.3);z-index:4}
+    .orb:disabled{cursor:default;animation:none;opacity:.25}
+    .orb:focus-visible{outline:2px solid #fff6b9;outline-offset:0}
+    @keyframes bob{to{translate:0 -7px}}
+    .msgbox{margin-top:15px;border:3px solid white;box-shadow:0 0 0 3px #401864,4px 4px 0 #230d46;background:#39105ded;min-height:69px;padding:11px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:clamp(22px,3vw,29px);line-height:1.1}
+    .msgbox .arrow{color:#ffaee8;font:14px 'Press Start 2P',monospace;flex-shrink:0;animation:blink 1s steps(2) infinite}
+    @keyframes blink{50%{opacity:.15}}
+    .floating-panel{position:fixed;z-index:20;inset:0;background:rgba(21,5,42,.68);display:grid;place-items:center;padding:22px;animation:appear .2s ease-out}
+    .floating-panel[hidden]{display:none}
+    .dialog-card{max-width:460px;width:100%;padding:25px 23px;background:#4b1d77;border:4px solid #ffbde9;box-shadow:0 0 0 5px #281044,10px 10px 0 #190c2b;text-align:center}
+    .dialog-card .large{display:block;font-size:46px;margin-bottom:15px}
+    .dialog-card h3{font:clamp(12px,2.5vw,16px)/1.7 'Press Start 2P',monospace;color:#fff3a9;margin:8px 0}
+    .dialog-card p{font-size:27px;line-height:1.18;margin:13px 0 24px}
+    .collector-card{max-width:414px;margin:10px auto 15px;background:linear-gradient(#fff68c,#f3d94b);border:9px solid #f3d055;outline:4px solid #61304f;box-shadow:9px 11px 0 #341347;color:#443344;padding:14px 13px 10px;transform:rotate(-1deg)}
+    .card-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;line-height:1.2}
+    .card-head b{font:clamp(12px,2.4vw,17px)/1.5 'Press Start 2P',monospace;color:#4a3359}
+    .card-head span{font:23px 'VT323',monospace;white-space:nowrap}
+    .artbox{height:176px;border:5px solid #dfae53;background:linear-gradient(180deg,#ffd2e7 0%,#ed9fd8 45%,#a578cb 65%,#825bbd 100%);position:relative;display:grid;place-items:center;margin:11px 0 4px;overflow:hidden}
+    .artbox:before{content:'✦   ✧      ✦      ✧       ✦';position:absolute;left:0;top:16px;width:100%;font-size:25px;color:#fff9c5;letter-spacing:7px;opacity:.8}
+    .artbox svg{width:126px;height:126px;image-rendering:pixelated;filter:drop-shadow(9px 10px 0 #ad4e92);animation:heartBeat 1.8s ease-in-out infinite;z-index:1}
+    .art-caption{text-align:center;font:15px/1.4 'VT323',monospace;color:#805b72;margin:3px 0 12px}
+    .ability{border-top:2px solid #ae9652;padding:10px 0 7px}
+    .ability .name{display:flex;justify-content:space-between;gap:10px;align-items:center;font:clamp(10px,1.8vw,13px)/1.5 'Press Start 2P',monospace;color:#473855}
+    .ability p{font-size:21px;line-height:1.12;margin:3px 0;color:#594b59}
+    .card-foot{border-top:2px solid #ae9652;padding-top:8px;font:16px 'VT323',monospace;display:flex;justify-content:space-between;color:#725c4b}
+    .particles{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden}
+    .particle{position:absolute;top:-40px;animation:fall var(--fall,2.9s) ease-in forwards;font-size:var(--size,23px);text-shadow:2px 2px #64277e}
+    @keyframes fall{to{transform:translate(var(--dx,0px),110vh) rotate(var(--spin,220deg));opacity:.25}}
+    .toast{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);z-index:80;background:#3e1a62;border:2px solid #ffe9ad;box-shadow:4px 4px #210b40;color:#fff4dc;padding:9px 17px;font:21px 'VT323',monospace;max-width:min(90vw,500px);text-align:center}
+    .toast[hidden]{display:none}
+    @media(max-width:600px){
+      .wrap{padding:13px 13px 15px}
+      .brand{max-width:200px;font-size:8px}
+      .screen{margin:17px auto}
+      .hero{padding:15px 3px 7px}
+      .headline{font-size:clamp(16px,5.3vw,24px);margin:16px 0 7px}
+      .lead{font-size:24px;margin:8px auto 24px}
+      .menu{gap:10px}
+      .menu-btn{width:calc((100% - 24px)/3);max-width:130px;min-height:124px;gap:9px}
+      .menu-btn svg{width:45px;height:45px}
+      .menu-btn strong{font-size:8px}
+      .menu-btn small{font-size:17px}
+      .panel{padding:14px}
+      .letter{padding:17px;min-height:285px}
+      .letter p{font-size:26px;min-height:170px}
+      .pixel-btn{padding:12px 13px;font-size:9px}
+      .playfield{height:clamp(325px,47vh,430px)}
+      .orb{width:42px;height:42px}
+      .orb svg{width:30px;height:30px}
+      .msgbox{font-size:22px}
+      .collector-card{max-width:360px}
+      .artbox{height:158px}
+    }
+    @media(max-width:370px){.menu-btn strong{font-size:7px}.brand{max-width:150px}.letter p{font-size:24px}.headline{font-size:16px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+    /* Estilos de la segunda versión: cinco juegos y quince sorpresas. */
+    .letter p#letterText {white-space:pre-wrap;overflow-wrap:anywhere;min-height:150px}
+    .letter p#letterText.typing:after{content:'▋';display:inline;color:#bb508b;animation:blink .6s steps(2) infinite}
+    .status-strip{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;margin:14px 0;font-size:22px;color:#fff3be}
+    .status-strip span{border:2px solid #c787e5;background:#36185a;padding:5px 11px}
+    .game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:15px auto}
+    .game-option{text-align:left;border:3px solid #d9a9ff;background:linear-gradient(145deg,#602690,#4b1b76);box-shadow:4px 4px 0 #2b123d;color:#fff;padding:17px 14px;display:flex;gap:13px;align-items:flex-start;min-height:126px;transition:transform .2s}
+    .game-option:hover{transform:translateY(-3px);border-color:#ffdeab}
+    .game-option b{display:block;font:clamp(10px,1.4vw,13px)/1.55 'Press Start 2P',monospace;color:#fff3a8;margin-bottom:7px}
+    .game-option span{font-size:22px;line-height:1.08}
+    .game-option .game-emoji{font-size:36px;min-width:36px;filter:drop-shadow(3px 3px #3f1a70)}
+    .mini-area{min-height:290px;border:3px solid #a7efff;background:#43216fbb;padding:15px;margin-top:12px;display:grid;place-items:center;overflow:hidden}
+    .mini-area>.full{width:100%}
+    .capsule-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:490px;width:100%;margin:auto}
+    .capsule{min-height:64px;border:3px solid #ffe5fb;background:#7a35a3;color:#fff;box-shadow:3px 3px #31124c;font-size:34px;line-height:1;padding:7px;transition:background .12s,transform .12s}
+    .capsule:hover:not(:disabled){background:#ad4fc0;transform:translateY(-2px)}
+    .capsule:disabled{cursor:default;opacity:.75}
+    .capsule.found{background:#9e3377;border-color:#fff19c;opacity:1}
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;max-width:490px;width:100%;margin:auto}
+    .memory-card{font-size:34px;height:79px;border:3px solid #ffccea;background:#7737a2;color:#ffedbc;box-shadow:3px 3px #321752}
+    .memory-card.revealed{background:#ffb6d0;color:#52205b}
+    .memory-card.matched{background:#fff0ad;color:#762f81;opacity:.88}
+    .star-field{position:relative;width:100%;height:270px;border:2px dashed #d89fe8;background:radial-gradient(circle at 40% 40%,#7839a3,#30175d);overflow:hidden}
+    .star-field::before{content:'✦    ✧             ✦      ✧      ✦         ✧';position:absolute;inset:18px;color:#c590e0;font-size:25px;pointer-events:none;letter-spacing:15px;opacity:.5;word-break:break-all}
+    .catch-target{width:72px;height:72px;position:absolute;border:3px solid #fff0ac;border-radius:50%;background:#aa2e9b;box-shadow:0 0 20px #ffa9d7b6;color:#fff8a9;font-size:43px;transform:translate(-50%,-50%);z-index:2;touch-action:manipulation}
+    .timer-info{font-size:26px;text-align:center;color:#fff5aa;margin:0 0 10px}
+    .quiz-title{font:clamp(11px,1.8vw,15px)/1.7 'Press Start 2P',monospace;text-align:center;color:#ffe9af;margin:0 0 20px}
+    .quiz-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .answer{border:3px solid #ffcce8;background:#7540a2;color:white;padding:14px 10px;font-size:24px;min-height:62px}
+    .answer:hover{background:#a947ab}
+    .maze{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;width:min(100%,342px);margin:auto}
+    .maze-tile{display:grid;place-items:center;aspect-ratio:1;border:2px solid #8f6ab5;background:#c08fd1;color:#3b1b65;font-size:clamp(19px,4vw,32px);line-height:1;min-width:0}
+    .maze-wall{background:#54236e;border-color:#4e1b75}
+    .maze-end{background:#ffdeab;border-color:#fff4de}
+    .maze-player{background:#ff98c6;border-color:#fff2e4;box-shadow:inset 0 0 0 2px #ee5d9f}
+    .maze-directions{display:grid;grid-template-columns:repeat(3,57px);justify-content:center;gap:5px;margin:13px auto 0}
+    .maze-directions button{height:47px;font-size:25px;border:2px solid #ffe0ec;background:#a73aa1;color:#fff}
+    .maze-directions .empty{visibility:hidden}
+    .surprise-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:17px auto 20px}
+    .surprise-item{background:#592582;border:3px solid #c997e8;box-shadow:4px 4px #321442;min-width:0;padding:14px 10px;display:flex;align-items:center;flex-direction:column;gap:10px;min-height:200px;text-align:center}
+    .surprise-item.unlocked{border-color:#ffe0a1;background:linear-gradient(160deg,#963a99,#5f2b88)}
+    .surprise-icon{font-size:38px;line-height:1}
+    .surprise-item h3{font:clamp(8px,1.5vw,11px)/1.7 'Press Start 2P',monospace;color:#fff3c0;margin:0;overflow-wrap:anywhere}
+    .surprise-item p{font-size:20px;line-height:1.05;margin:0;flex:1}
+    .surprise-item button{font:clamp(8px,1.2vw,10px)/1.4 'Press Start 2P',monospace;color:#431554;background:#ffe2ad;border:2px solid #fff4e9;padding:10px 7px;width:100%;min-height:41px}
+    .surprise-item button:hover{background:#fff7ce}
+    .reward-card{background:linear-gradient(155deg,#fff2d6,#ffbdd6 65%,#df9dd6);border:8px solid #fff1a6;outline:4px solid #713a90;box-shadow:8px 8px 0 #2b134b;color:#4b2b5f;max-width:540px;margin:22px auto 25px;text-align:center;padding:23px 19px 19px;transform:rotate(-.4deg)}
+    .reward-star{font-size:66px;line-height:1.2}
+    .reward-kicker{font:12px/1.8 'Press Start 2P',monospace;letter-spacing:.5px;color:#9a4679;margin:13px 0}
+    .reward-card h3{font:clamp(13px,2.6vw,21px)/1.6 'Press Start 2P',monospace;color:#813770;margin:12px 0 18px}
+    .reward-copy{font:clamp(27px,3.9vw,36px)/1.13 'VT323',monospace;margin:16px 0 23px;overflow-wrap:anywhere}
+    .reward-stamp{border-top:2px solid #bb649b;padding-top:12px;font:11px/1.7 'Press Start 2P',monospace;color:#994679}
+    .safe-reset{text-align:center;margin:20px 0 0}
+    .subtle-link{background:none;border:0;text-decoration:underline;text-underline-offset:3px;color:#e5bfef;font-size:19px}
+    @media(max-width:600px){
+      .game-grid{grid-template-columns:1fr}.game-option{min-height:100px;padding:13px}.game-option b{font-size:10px}
+      .surprise-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      .surprise-item{padding:12px 8px;min-height:180px}.surprise-item h3{font-size:9px}.surprise-item button{font-size:8px}
+      .mini-area{padding:11px;min-height:260px}.memory-card{height:65px}.capsule{min-height:62px}
+      .quiz-options{grid-template-columns:1fr}.answer{min-height:48px}
+      .status-strip{font-size:20px}.reward-card{padding:16px 13px}
+    }
+    @media(max-width:355px){.surprise-grid{grid-template-columns:1fr}.capsule{font-size:29px}.memory-card{font-size:30px}}
+  </style>
+</head>
+<body>
+<canvas id="world" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="particles" id="particles" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="topbar">
+    <span class="brand">✦ UN MUNDO HECHO PARA TI</span>
+    <div class="top-actions">
+      <button class="iconbtn" id="soundBtn" aria-label="Activar música" title="Activar o desactivar música">♪̸</button>
+      <button class="iconbtn" id="resetBtn" aria-label="Reiniciar aventura" title="Volver al inicio">↺</button>
+    </div>
+  </header>
+  <main>
+    <section class="screen hero" id="home" aria-label="Inicio del juego">
+      <span class="floatheart" aria-hidden="true">♥</span>
+      <div class="eyebrow" id="welcomeEyebrow">HOLA, MI PERSONA FAVORITA</div>
+      <h1 class="headline" id="welcomeTitle">UN UNIVERSO PARA TI</h1>
+      <p class="lead" id="welcomeLead">Hay algo especial que quiero contarte... ¿me acompañas?</p>
+      <nav class="menu" aria-label="Elegir aventura">
+        <button class="menu-btn" id="openLetter" aria-label="Leer una carta">
+          <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path fill="#5a2a79" d="M1 4h14v9H1z"/><path fill="#fff0ea" d="M2 3h12v9H2z"/><path fill="#ffa8ca" d="M2 4h12v2H2z"/><path fill="#d977a9" d="M2 6h2v2H2zm10 0h2v2h-2zM4 8h2v2H4zm6 0h2v2h-2zM6 10h4v1H6z"/><path fill="#ff769e" d="M6 6h4v1H6z"/></svg>
+          <strong>CARTA</strong><small>Un mensaje</small>
+        </button>
+        <button class="menu-btn" id="openGame" aria-label="Elegir entre cinco minijuegos">
+          <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path fill="#761a64" d="M3 3h4v1H3zm6 0h4v1H9zM2 4h12v7H2zM4 11h8v2H4zm2 2h4v1H6z"/><path fill="#ff74aa" d="M3 4h4v2H3zm6 0h4v2H9zM2 6h12v4H2zm2 4h8v2H4zm2 2h4v1H6z"/><path fill="#ffbed5" d="M3 5h3v2H3z"/><path fill="#ef377b" d="M8 8h5v2H8zm-3 2h7v1H5z"/></svg>
+          <strong>JUGAR</strong><small>5 juegos</small>
+        </button>
+        <button class="menu-btn locked" id="openPrize" aria-label="Abrir colección de quince sorpresas">
+          <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path fill="#542361" d="M2 6h12v8H2z"/><path fill="#fff18a" d="M3 7h10v6H3z"/><path fill="#ff90b6" d="M1 5h14v3H1zM7 5h2v8H7z"/><path fill="#ffcee0" d="M4 3h3v2H4zm5 0h3v2H9z"/><path fill="#e3558a" d="M3 2h3v1H3zm7 0h3v1h-3zM6 3h4v3H6z"/></svg>
+          <strong>SORPRESA</strong><small id="prizeStatus">Bloqueada 🔒</small>
+        </button>
+      </nav>
+      <p class="micro">15 sorpresas secretas · 5 juegos para desbloquearlas ✧</p>
+    </section>
+
+    <section class="screen" id="letterScreen" hidden aria-label="Carta de amor">
+      <div class="panel">
+        <h2 class="panel-title">✉ TIENES UNA CARTA NUEVA</h2>
+        <article class="letter">
+          <p class="date" id="letterDate">Para ti, con todo mi cariño ♡</p>
+          <h3 id="letterGreeting">Querida tú:</h3>
+          <p id="letterText" aria-live="off"></p>
+          <div class="signature" id="letterSign">Con mucho amor ♥</div>
+        </article>
+        <p class="small-note" id="pageCount">Página 1 de 3</p>
+        <div class="actions">
+          <button class="pixel-btn" id="letterBack">← VOLVER</button>
+          <button class="pixel-btn primary" id="letterNext">SIGUIENTE →</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="gameSelectScreen" hidden aria-label="Elegir uno de los cinco juegos">
+      <div class="panel">
+        <h2 class="panel-title">✦ CINCO JUEGOS, QUINCE SORPRESAS ✦</h2>
+        <p class="small-note">Gana cualquiera de los juegos para descubrir <strong>una sorpresa aleatoria nueva</strong>. Puedes repetirlos hasta reunir las 15.</p>
+        <div class="status-strip"><span id="gamesPlayed">Partidas ganadas: 0</span><span id="collectionCount">Sorpresas: 0/15</span></div>
+        <div class="game-grid" id="gameGrid"></div>
+        <div class="actions"><button class="pixel-btn" id="gamesBack">← INICIO</button><button class="pixel-btn" id="gamesCollection">MIS SORPRESAS ♡</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="playScreen" hidden aria-label="Minijuego">
+      <div class="panel">
+        <h2 class="panel-title" id="playTitle">✦ JUEGO ✦</h2>
+        <p class="small-note" id="playInstructions"></p>
+        <div class="status-strip"><span id="playStat">Progreso: 0</span><span id="playGameTag">1 / 5</span></div>
+        <div class="mini-area" id="miniArea"></div>
+        <div class="msgbox" aria-live="polite"><span id="playMessage">¡Adelante!</span><span class="arrow">♥</span></div>
+        <div class="actions"><button class="pixel-btn" id="playBack">← JUEGOS</button><button class="pixel-btn" id="playRestart">REINICIAR ↺</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="surprisesScreen" hidden aria-label="Colección de sorpresas">
+      <div class="panel">
+        <h2 class="panel-title">✦ TU COLECCIÓN DE SORPRESAS ✦</h2>
+        <p class="small-note" id="surpriseIntro">Cada victoria revela una sorpresa distinta. Las demás siguen guardando su secreto.</p>
+        <div class="status-strip"><span id="surpriseProgress">0 / 15 desbloqueadas</span><span id="surpriseWins">0 victorias</span></div>
+        <div class="progress" role="progressbar" aria-label="Sorpresas desbloqueadas" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" id="surpriseBar"><div class="progress-inner" id="surpriseProgressInner"></div></div>
+        <div class="surprise-grid" id="surpriseGrid"></div>
+        <div class="actions"><button class="pixel-btn" id="surprisesBack">← INICIO</button><button class="pixel-btn primary" id="surprisesPlay">IR A JUGAR ♥</button></div>
+        <div class="safe-reset"><button class="subtle-link" id="clearProgress">Borrar mi progreso en este dispositivo</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="surpriseDetailScreen" hidden aria-label="Sorpresa desbloqueada">
+      <div class="panel">
+        <h2 class="panel-title">✦ SORPRESA DESBLOQUEADA ✦</h2>
+        <div class="reward-card" id="rewardCard">
+          <div class="reward-star" id="rewardIcon">♥</div>
+          <p class="reward-kicker" id="rewardNumber">RECOMPENSA N.º 01 / 15</p>
+          <h3 id="rewardTitle">¡Una sorpresa para ti!</h3>
+          <p class="reward-copy" id="rewardText"></p>
+          <div class="reward-stamp">♥ CANJEABLE CON AMOR ♥</div>
+        </div>
+        <p class="small-note">Puedes tomar una captura de esta tarjeta y guardarla para reclamar tu regalo.</p>
+        <div class="actions"><button class="pixel-btn" id="rewardBack">← COLECCIÓN</button><button class="pixel-btn primary" id="rewardCopy">COPIAR MI PREMIO ♡</button></div>
+      </div>
+    </section>
+  </main>
+  <footer>✦ Hecho con mucho amor, solo para ti ✦</footer>
+</div>
+
+<div class="floating-panel" id="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+  <div class="dialog-card"><span class="large" id="dialogIcon" aria-hidden="true">♥</span><h3 id="dialogTitle">¡QUÉ BONITO!</h3><p id="dialogText"></p><div class="actions"><button class="pixel-btn" id="dialogCancel" hidden>CANCELAR</button><button class="pixel-btn primary" id="dialogOk">CONTINUAR →</button></div></div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* =============================================================
+   PERSONALIZA AQUÍ: nombres, tres páginas, mensajes y 15 premios.
+   Cada victoria desbloquea una sorpresa NUEVA AL AZAR.
+   ============================================================= */
+const CONFIG = {
+  nombreNovia: 'Mi esposita hermosa Laurita Piojito Celosa',
+  titulo: 'UN UNIVERSO PARA TI',
+  bienvenida: 'Tengo cinco aventuras y quince sorpresas esperando por ti. ¿Jugamos, amor?',
+  saludoCarta: 'Mi amor:',
+  firma: 'Con todo mi amor ♥',
+  paginasCarta: [
+    'Desde que llegaste a mi vida, incluso los días más sencillos tienen algo especial. Tu sonrisa es uno de mis lugares favoritos.',
+    'Me encanta compartir momentos contigo: las risas, las conversaciones y hasta esos pequeños silencios en los que todo se siente bien.',
+    'Hice este pequeño universo para ti: cinco juegos y quince sorpresas. Gana una partida, descubre un regalo y recuerda siempre cuánto te quiero. ♥'
+  ],
+  mensajesCorazon: [
+    'Tu sonrisa es mi lugar favorito. ♥',
+    'Contigo todo es un poquito más mágico. ✦',
+    'Eres mi casualidad más bonita. ♥',
+    'Me encanta jugar a vivir aventuras contigo. ★',
+    'Te elegiría en todos los universos. ♥'
+  ],
+  sorpresas: [
+    {id:'compra',titulo:'¡LO QUE TÚ QUIERAS!',icono:'🎁',texto:'Te comprare lo que quieras, toma captura y tendras derecho a reclamar tu regalo'},
+    {id:'cocinar',titulo:'CHEF A TUS ÓRDENES',icono:'🍝',texto:'Tienes derecho a pedirme que te cocine una comida sin que yo me oponga'},
+    {id:'malvada',titulo:'SORPRESA MALVADA',icono:'😈',texto:'Sorpresa amor, por encontrar esta sorpresa malvada me tienes que comprar un peluche sin que yo lo sepa y me lo regales (sabre que me debes un peluche)'},
+    {id:'peluche',titulo:'VALE POR UN PELUCHE',icono:'🧸',texto:'Esta sorpresa te da derecho de exigirme y pedirme un peluche'},
+    {id:'cita',titulo:'CITA A TU ELECCIÓN',icono:'💐',texto:'Tienes derecho a elegir nuestra próxima cita. Yo me encargo de organizarla.'},
+    {id:'pelicula',titulo:'CINE CONTIGO',icono:'🍿',texto:'Tú eliges la película y yo llevo las botanas. ¡Sin quejas por el género!'},
+    {id:'masaje',titulo:'MASAJE RELAJANTE',icono:'🌸',texto:'Vale por un masaje relajante de 20 minutos, hecho con todo mi cariño.'},
+    {id:'postre',titulo:'TU POSTRE FAVORITO',icono:'🍰',texto:'Tienes derecho a pedirme tu postre favorito. Lo prepararé o te lo conseguiré.'},
+    {id:'playlist',titulo:'NUESTRA PLAYLIST',icono:'🎵',texto:'Voy a prepararte una playlist con canciones que me recuerdan a ti.'},
+    {id:'aventura',titulo:'MINI AVENTURA',icono:'🌙',texto:'Tienes derecho a escoger un plan sorpresa para que vivamos una pequeña aventura juntos.'},
+    {id:'abrazo',titulo:'ABRAZO INFINITO',icono:'💗',texto:'Vale por un abrazo larguísimo, de esos que hacen olvidar el mundo por un ratito.'},
+    {id:'desayuno',titulo:'DESAYUNO ESPECIAL',icono:'🥞',texto:'Te debo un desayuno preparado especialmente para ti, con mucho amor.'},
+    {id:'flores',titulo:'FLORES PORQUE SÍ',icono:'🌷',texto:'Tienes derecho a pedirme un ramito de flores solo porque sí.'},
+    {id:'cartaextra',titulo:'CARTA SECRETA',icono:'💌',texto:'Te escribiré una carta nueva contando diez cosas que adoro de ti.'},
+    {id:'deseo',titulo:'TU DESEO ES MI MISIÓN',icono:'⭐',texto:'Puedes elegirme un pequeño reto romántico para cumplirlo juntos.'}
+  ]
+};
+
+const $ = id => document.getElementById(id);
+const screens = ['home','letterScreen','gameSelectScreen','playScreen','surprisesScreen','surpriseDetailScreen'];
+const gameInfo = [
+  {id:'capsulas',nombre:'Corazones escondidos',emoji:'💝',desc:'Busca 5 corazones entre 20 cápsulas.'},
+  {id:'memoria',nombre:'Memoria romántica',emoji:'🎀',desc:'Encuentra las 6 parejas de tarjetas.'},
+  {id:'estrellas',nombre:'Atrapa estrellas',emoji:'⭐',desc:'Atrapa 10 estrellas antes de que termine el tiempo.'},
+  {id:'preguntas',nombre:'Quiz del amor',emoji:'💌',desc:'Responde correctamente cinco preguntas.'},
+  {id:'laberinto',nombre:'Laberinto de amor',emoji:'🧩',desc:'Reúne tres corazones y llega a la meta.'}
+];
+const surpriseIds=CONFIG.sorpresas.map(s=>s.id);
+const allowed=new Set(surpriseIds);
+const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const STORAGE_KEY='universo-para-ti-progreso-v2';
+const shuffled=(items)=>{
+  const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
+};
+function newSave(){return {played:false,wins:0,unlocked:[],order:shuffled(surpriseIds),byGame:{capsulas:0,memoria:0,estrellas:0,preguntas:0,laberinto:0}};}
+function loadSave(){
+  let raw;try{raw=JSON.parse(localStorage.getItem(STORAGE_KEY));}catch(_){return newSave();}
+  if(!raw||typeof raw!=='object')return newSave();
+  const unlocked=Array.isArray(raw.unlocked)?[...new Set(raw.unlocked.filter(id=>allowed.has(id)))]:[];
+  const validOrder=Array.isArray(raw.order)&&raw.order.length===15&&new Set(raw.order).size===15&&raw.order.every(id=>allowed.has(id));
+  const byGame=Object.fromEntries(gameInfo.map(g=>[g.id,Math.max(0,Number.isInteger(raw.byGame?.[g.id])?raw.byGame[g.id]:0)]));
+  return {played:!!raw.played,wins:Math.max(0,Number.isInteger(raw.wins)?raw.wins:0),unlocked,order:validOrder?raw.order:shuffled(surpriseIds),byGame};
+}
+let save=loadSave(),current='home',page=0,letterTimer=null,letterTyping=false,round=null,activeGame=null;
+let gameTimers=[],modalAction=null,lastFocus=null,toastTimer=null,musicOn=false,audioCtx=null,musicTimer=null,musicStep=0,targetedRewardId=null;
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(save));}catch(_){showToast('El navegador no pudo guardar el progreso: evita cerrar la pestaña.');}}
+function gameTimeout(fn,ms){let t=setTimeout(fn,ms);gameTimers.push({id:t,interval:false});return t;}
+function gameInterval(fn,ms){let t=setInterval(fn,ms);gameTimers.push({id:t,interval:true});return t;}
+function clearGameTimers(){gameTimers.forEach(t=>t.interval?clearInterval(t.id):clearTimeout(t.id));gameTimers=[];}
+function leaveGame(){clearGameTimers();round=null;activeGame=null;}
+function go(id){
+  if(current==='playScreen'&&id!=='playScreen')leaveGame();
+  if(current==='letterScreen'&&id!=='letterScreen')clearInterval(letterTimer);
+  current=id;screens.forEach(s=>$(s).hidden=s!==id);
+  window.scrollTo({top:0,behavior:'instant'});
+  if(id==='letterScreen')renderLetter();
+  if(id==='gameSelectScreen')renderGameChoices();
+  if(id==='surprisesScreen')renderCollection();
+}
+function initialize(){
+  $('welcomeEyebrow').textContent='HOLA, '+CONFIG.nombreNovia.toUpperCase();
+  $('welcomeTitle').textContent=CONFIG.titulo;
+  $('welcomeLead').textContent=CONFIG.bienvenida;
+  $('letterGreeting').textContent=CONFIG.saludoCarta;
+  $('letterSign').textContent=CONFIG.firma;
+  document.title=CONFIG.titulo+' ✦';
+  updateHome();
+}
+function updateHome(){
+  $('prizeStatus').textContent=save.played?`${save.unlocked.length}/15 ganadas`:'Bloqueada 🔒';
+  $('openPrize').classList.toggle('locked',!save.played);
+}
+function renderLetter(){
+  clearInterval(letterTimer);letterTimer=null;
+  const full=String(CONFIG.paginasCarta[page]||'');const letters=Array.from(full),node=$('letterText');
+  $('pageCount').textContent=`Página ${page+1} de ${CONFIG.paginasCarta.length}`;
+  $('letterBack').textContent=page===0?'← INICIO':'← ANTERIOR';
+  node.setAttribute('aria-label',full);
+  if(reduceMotion||!letters.length){letterTyping=false;node.classList.remove('typing');node.textContent=full;setNextLabel();return;}
+  let index=0;letterTyping=true;node.textContent='';node.classList.add('typing');$('letterNext').textContent='MOSTRAR TODO →';
+  letterTimer=setInterval(()=>{
+    index=Math.min(letters.length,index+2);
+    node.textContent=letters.slice(0,index).join('');
+    if(index>=letters.length)finishLetter();
+  },46);
+}
+function setNextLabel(){$('letterNext').textContent=page===CONFIG.paginasCarta.length-1?'¡A JUGAR! →':'SIGUIENTE →';}
+function finishLetter(){
+  clearInterval(letterTimer);letterTimer=null;letterTyping=false;
+  $('letterText').textContent=CONFIG.paginasCarta[page]||'';
+  $('letterText').classList.remove('typing');setNextLabel();
+}
+function showDialog({title,text,icon='♥',actionLabel='CONTINUAR →',onContinue=null,cancelLabel=null}){
+  modalAction=onContinue;lastFocus=document.activeElement;
+  $('dialogTitle').textContent=title;$('dialogText').textContent=text;
+  $('dialogIcon').textContent=icon;$('dialogOk').textContent=actionLabel;
+  $('dialogCancel').hidden=!cancelLabel;if(cancelLabel)$('dialogCancel').textContent=cancelLabel;
+  $('dialog').hidden=false;$('dialogOk').focus();
+}
+function dismissDialog(){
+  $('dialog').hidden=true;modalAction=null;if(lastFocus?.focus)lastFocus.focus();
+}
+function closeDialog(){
+  $('dialog').hidden=true;const callback=modalAction;modalAction=null;
+  if(callback)callback();else if(lastFocus?.focus)lastFocus.focus();
+}
+function showToast(text){
+  clearTimeout(toastTimer);$('toast').textContent=text;$('toast').hidden=false;
+  toastTimer=setTimeout(()=>$('toast').hidden=true,3000);
+}
+function openGameIntro(){
+  targetedRewardId=null;
+  showDialog({title:'¡5 JUEGOS Y 15 SORPRESAS!',text:'Tienes cinco juegos diferentes. Cada vez que ganes uno, desbloquearás una de las quince sorpresas al azar, sin repetir. ¡Puedes jugar cuantas veces quieras!',icon:'🎮',actionLabel:'ELEGIR MI JUEGO →',onContinue:()=>go('gameSelectScreen')});
+}
+function openLockedIntro(id){
+  if(save.unlocked.includes(id)){showReward(id);return;}
+  targetedRewardId=id;
+  const index=save.order.indexOf(id)+1;
+  showDialog({title:`DESBLOQUEAR SORPRESA ${index}`,text:'¡Elegiste esta sorpresa secreta! Gana cualquiera de los cinco juegos y desbloquearás precisamente esta casilla. Su contenido será una sorpresa hasta que ganes.',icon:'🔒',actionLabel:'ELEGIR UN JUEGO →',onContinue:()=>go('gameSelectScreen')});
+}
+function openCollection(){
+  if(!save.played){
+    showDialog({title:'SORPRESAS BLOQUEADAS',text:'Las 15 sorpresas están escondidas. Entra primero a jugar; cada victoria revelará un regalo aleatorio.',icon:'🔒',actionLabel:'IR A JUGAR →',onContinue:()=>go('gameSelectScreen')});
+  }else go('surprisesScreen');
+}
+function renderGameChoices(){
+  $('gamesPlayed').textContent=`Partidas ganadas: ${save.wins}`;
+  $('collectionCount').textContent=`Sorpresas: ${save.unlocked.length}/15`;
+  $('gameGrid').replaceChildren();
+  gameInfo.forEach((g,index)=>{
+    const b=document.createElement('button');b.type='button';b.className='game-option';
+    const icon=document.createElement('span');icon.className='game-emoji';icon.textContent=g.emoji;
+    const copy=document.createElement('span');const heading=document.createElement('b');heading.textContent=`${index+1}. ${g.nombre}`;
+    const desc=document.createElement('span');desc.textContent=g.desc;
+    const record=document.createElement('small');record.style.display='block';record.style.marginTop='8px';record.textContent=`Victorias: ${save.byGame[g.id]}`;
+    copy.append(heading,desc,record);b.append(icon,copy);
+    b.addEventListener('click',()=>startGame(g.id));$('gameGrid').appendChild(b);
+  });
+}
+function startGame(id){
+  if(!gameInfo.some(g=>g.id===id))return;
+  clearGameTimers();activeGame=id;round={done:false};
+  if(!save.played){save.played=true;persist();updateHome();}
+  current='playScreen';screens.forEach(s=>$(s).hidden=s!=='playScreen');
+  window.scrollTo({top:0,behavior:'instant'});
+  const g=gameInfo.find(g=>g.id===id);
+  $('playTitle').textContent='✦ '+g.nombre.toUpperCase()+' ✦';
+  $('playInstructions').textContent=g.desc;
+  $('playGameTag').textContent=`JUEGO ${gameInfo.findIndex(x=>x.id===id)+1} / 5`;
+  $('playMessage').textContent='¡Tú puedes!';$('miniArea').replaceChildren();
+  switch(id){
+    case 'capsulas':setupCapsules();break;
+    case 'memoria':setupMemory();break;
+    case 'estrellas':setupStars();break;
+    case 'preguntas':setupQuiz();break;
+    case 'laberinto':setupMaze();break;
+  }
+}
+function completeGame(){
+  if(!round||round.done)return;
+  round.done=true;clearGameTimers();
+  save.wins++;save.byGame[activeGame]++;
+  const remaining=surpriseIds.filter(id=>!save.unlocked.includes(id));
+  const rewardId=remaining.length?(targetedRewardId&&remaining.includes(targetedRewardId)?targetedRewardId:remaining[Math.floor(Math.random()*remaining.length)]):null;
+  targetedRewardId=null;
+  if(rewardId)save.unlocked.push(rewardId);
+  persist();updateHome();confetti(38);
+  $('playStat').textContent='¡MISIÓN CUMPLIDA!';
+  $('playMessage').textContent=rewardId?'¡Ganaste una sorpresa que aún no tenías! ♥':'¡Terminaste otra aventura! Ya tienes las 15 sorpresas.';
+  const area=$('miniArea');area.replaceChildren();
+  const content=document.createElement('div');content.className='full';content.style.textAlign='center';
+  const h=document.createElement('h3');h.className='panel-title';h.textContent='★ ¡LO CONSEGUISTE! ★';
+  const p=document.createElement('p');p.style.fontSize='29px';p.textContent=rewardId?'Ganaste una nueva sorpresa aleatoria. ¿Quieres ver cuál es?':'¡Colección completa! Ya descubriste todos los regalos.';
+  const b=document.createElement('button');b.className='pixel-btn primary';b.type='button';b.textContent=rewardId?'ABRIR MI SORPRESA ♥':'VER MIS 15 SORPRESAS →';
+  b.addEventListener('click',()=>rewardId?showReward(rewardId):go('surprisesScreen'));
+  content.append(h,p,b);area.appendChild(content);
+  playSfx('win');
+}
+
+// JUEGO 1: 20 cápsulas, cinco corazones.
+function setupCapsules(){
+  const slots=20;round.opened=new Set();round.targets=new Set(shuffled(Array.from({length:slots},(_,i)=>i)).slice(0,5));round.found=0;
+  $('playStat').textContent='Corazones: 0 / 5';
+  const wrap=document.createElement('div');wrap.className='full';
+  const board=document.createElement('div');board.className='capsule-grid';
+  for(let i=0;i<slots;i++){
+    const b=document.createElement('button');b.className='capsule';b.type='button';b.textContent='✧';b.setAttribute('aria-label',`Abrir cápsula ${i+1}`);
+    b.addEventListener('click',()=>{
+      if(round.done||round.opened.has(i))return;
+      round.opened.add(i);b.disabled=true;
+      if(round.targets.has(i)){
+        b.textContent='♥';b.classList.add('found');round.found++;
+        $('playStat').textContent=`Corazones: ${round.found} / 5`;
+        $('playMessage').textContent=CONFIG.mensajesCorazon[round.found-1]||'¡Encontraste uno!';playSfx('win');
+        if(round.found===5)completeGame();
+      }else {b.textContent='✦';$('playMessage').textContent='Una estrella bonita, pero el corazón está en otra cápsula.';playSfx('tap');}
+    });board.appendChild(b);
+  }
+  const hint=document.createElement('button');hint.type='button';hint.className='pixel-btn';hint.style.marginTop='15px';hint.textContent='PISTA ✧';
+  hint.addEventListener('click',()=>{
+    if(round.done)return;
+    const index=[...round.targets].find(i=>!round.opened.has(i));if(index===undefined)return;
+    const b=board.children[index];b.style.boxShadow='0 0 22px 8px #fff5a6';
+    gameTimeout(()=>b.style.boxShadow='',1500);$('playMessage').textContent='Una cápsula con corazón está brillando. ¡Mírala!';playSfx('hint');
+  });wrap.append(board,hint);$('miniArea').append(wrap);
+}
+
+// JUEGO 2: memoria de seis parejas.
+function setupMemory(){
+  const symbols=['♥','✦','☾','🌸','🧸','🎀'];const deck=shuffled([...symbols,...symbols]);
+  round.flipped=[];round.matched=new Set();round.busy=false;
+  $('playStat').textContent='Parejas: 0 / 6';
+  const board=document.createElement('div');board.className='memory-grid';
+  deck.forEach((symbol,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='memory-card';b.textContent='?';
+    b.setAttribute('aria-label',`Tarjeta oculta ${i+1}`);
+    b.addEventListener('click',()=>{
+      if(round.done||round.busy||round.flipped.includes(i)||round.matched.has(i))return;
+      b.textContent=symbol;b.classList.add('revealed');b.setAttribute('aria-label',symbol);
+      round.flipped.push(i);playSfx('tap');
+      if(round.flipped.length===2){
+        const [a,c]=round.flipped;
+        if(deck[a]===deck[c]){
+          round.matched.add(a);round.matched.add(c);round.flipped=[];
+          for(const idx of [a,c]){board.children[idx].classList.add('matched');board.children[idx].disabled=true;}
+          const pairs=round.matched.size/2;$('playStat').textContent=`Parejas: ${pairs} / 6`;
+          $('playMessage').textContent='¡Encontraste una pareja! ♡';playSfx('win');
+          if(pairs===6)completeGame();
+        }else{
+          round.busy=true;$('playMessage').textContent='No son iguales. ¡Intenta recordarlas!';
+          gameTimeout(()=>{
+            for(const idx of [a,c]){board.children[idx].textContent='?';board.children[idx].classList.remove('revealed');board.children[idx].setAttribute('aria-label',`Tarjeta oculta ${idx+1}`);}
+            round.flipped=[];round.busy=false;
+          },720);
+        }
+      }
+    });board.appendChild(b);
+  });$('miniArea').appendChild(board);
+}
+
+// JUEGO 3: atrapa 10 estrellas en 45 segundos.
+function setupStars(){
+  round.catches=0;round.left=45;
+  $('playStat').textContent='Estrellas: 0 / 10';
+  const wrap=document.createElement('div');wrap.className='full';
+  const info=document.createElement('p');info.className='timer-info';info.textContent='Tiempo restante: 45 s';
+  const field=document.createElement('div');field.className='star-field';
+  const star=document.createElement('button');star.type='button';star.className='catch-target';star.textContent='★';star.setAttribute('aria-label','Atrapar estrella');
+  const move=()=>{star.style.left=(13+Math.random()*74)+'%';star.style.top=(20+Math.random()*60)+'%';};
+  star.addEventListener('click',()=>{
+    if(round.done)return;round.catches++;$('playStat').textContent=`Estrellas: ${round.catches} / 10`;
+    $('playMessage').textContent='¡Otra estrella atrapada!';playSfx('tap');
+    if(round.catches>=10)completeGame();else move();
+  });
+  move();field.appendChild(star);wrap.append(info,field);$('miniArea').append(wrap);
+  gameInterval(()=>{
+    if(round.done)return;
+    round.left--;info.textContent=`Tiempo restante: ${round.left} s`;
+    if(round.left<=0){
+      clearGameTimers();star.disabled=true;
+      $('playMessage').textContent='Se acabó el tiempo. Puedes intentarlo de nuevo con REINICIAR.';
+      info.textContent='Tiempo terminado. ¡Inténtalo otra vez!';
+    }
+  },1000);
+}
+
+// JUEGO 4: cinco preguntas de respuesta inequívoca.
+const QUESTIONS=[
+  {q:'¿Qué palabra tiene cuatro letras y dice mucho sobre lo que siento?',choices:['AMOR','LUNA','SOL'],right:0},
+  {q:'¿Qué es lo más valioso de este universo?',choices:['Las monedas','Compartir momentos contigo','Los puntos'],right:1},
+  {q:'¿Qué quiero hacer cuando tengas un día difícil?',choices:['Salir corriendo','Hacerme el dormido','Escucharte y abrazarte'],right:2},
+  {q:'¿Qué quiero coleccionar a tu lado?',choices:['Recuerdos bonitos','Piedritas mágicas','Tickets viejos'],right:0},
+  {q:'¿En cuántos universos te volvería a elegir?',choices:['En todos','En ninguno','Solo en uno'],right:0}
+];
+function setupQuiz(){round.index=0;$('playStat').textContent='Preguntas: 0 / 5';renderQuestion();}
+function renderQuestion(){
+  if(round.done)return;
+  const q=QUESTIONS[round.index],area=$('miniArea');area.replaceChildren();
+  const wrap=document.createElement('div');wrap.className='full';
+  const title=document.createElement('h3');title.className='quiz-title';title.textContent=q.q;
+  const options=document.createElement('div');options.className='quiz-options';
+  q.choices.forEach((choice,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='answer';b.textContent=choice;
+    b.addEventListener('click',()=>{
+      if(round.done)return;
+      if(i===q.right){round.index++;$('playStat').textContent=`Preguntas: ${round.index} / 5`;
+        $('playMessage').textContent='¡Respuesta correcta! ♥';playSfx('win');
+        if(round.index===QUESTIONS.length)completeGame();else renderQuestion();
+      }else{$('playMessage').textContent='¡Casi! Prueba otra respuesta.';playSfx('tap');}
+    });options.appendChild(b);
+  });wrap.append(title,options);area.append(wrap);
+}
+
+// JUEGO 5: laberinto táctil y con teclado. # es muro, H es corazón.
+const MAZE=['S..#.H','##.#..','H....#','.###..','..H...','#...#E'];
+function setupMaze(){
+  round.player=[0,0];round.hearts=new Set();round.map=MAZE;
+  $('playStat').textContent='Corazones: 0 / 3';
+  const wrap=document.createElement('div');wrap.className='full';
+  const board=document.createElement('div');board.className='maze';board.id='mazeBoard';
+  const arrows=document.createElement('div');arrows.className='maze-directions';
+  const layout=[null,['↑',-1,0],null,['←',0,-1],['↓',1,0],['→',0,1]];
+  for(const move of layout){
+    if(!move){const a=document.createElement('span');a.className='empty';arrows.append(a);continue;}
+    const b=document.createElement('button');b.type='button';b.textContent=move[0];b.setAttribute('aria-label',`Mover ${{'↑':'arriba','←':'izquierda','↓':'abajo','→':'derecha'}[move[0]]}`);
+    b.addEventListener('click',()=>moveMaze(move[1],move[2]));arrows.append(b);
+  }
+  wrap.append(board,arrows);$('miniArea').append(wrap);paintMaze();
+  $('playMessage').textContent='Usa las flechas de pantalla o del teclado para moverte.';
+}
+function paintMaze(){
+  const board=$('mazeBoard');if(!board)return;board.replaceChildren();
+  round.map.forEach((row,r)=>Array.from(row).forEach((tile,c)=>{
+    const cell=document.createElement('span');cell.className='maze-tile';
+    const key=`${r},${c}`;
+    if(tile==='#')cell.classList.add('maze-wall');
+    if(tile==='E')cell.classList.add('maze-end');
+    if(r===round.player[0]&&c===round.player[1]){cell.classList.add('maze-player');cell.textContent='♥';}
+    else if(tile==='H'&&!round.hearts.has(key))cell.textContent='💝';
+    else if(tile==='E')cell.textContent='🏁';
+    else if(tile==='#')cell.textContent='';
+    else cell.textContent='·';
+    board.appendChild(cell);
+  }));
+}
+function moveMaze(dr,dc){
+  if(current!=='playScreen'||activeGame!=='laberinto'||!round||round.done)return;
+  const r=round.player[0]+dr,c=round.player[1]+dc;
+  if(r<0||c<0||r>=6||c>=6||round.map[r][c]==='#'){
+    $('playMessage').textContent='¡Ups! Hay un muro por ahí. Busca otro camino.';return;
+  }
+  round.player=[r,c];const tile=round.map[r][c];
+  if(tile==='H'&&!round.hearts.has(`${r},${c}`)){
+    round.hearts.add(`${r},${c}`);$('playStat').textContent=`Corazones: ${round.hearts.size} / 3`;
+    $('playMessage').textContent='¡Recogiste un corazón!';playSfx('win');
+  }else if(tile==='E'&&round.hearts.size<3){$('playMessage').textContent='¡Ya ves la meta! Pero te faltan corazones.';}
+  else $('playMessage').textContent='¡Sigue adelante!';
+  paintMaze();
+  if(tile==='E'&&round.hearts.size===3)completeGame();
+}
+
+function renderCollection(){
+  $('surpriseProgress').textContent=`${save.unlocked.length} / 15 desbloqueadas`;
+  $('surpriseWins').textContent=`${save.wins} victorias`;
+  $('surpriseBar').setAttribute('aria-valuenow',save.unlocked.length);
+  $('surpriseProgressInner').style.width=`${save.unlocked.length/15*100}%`;
+  $('surpriseIntro').textContent=save.unlocked.length===15?'¡Las descubriste todas! Puedes ver tus regalos cuando quieras.':'Cada victoria revela una sorpresa distinta; las que faltan siguen bajo llave.';
+  $('surpriseGrid').replaceChildren();
+  save.order.forEach((id,index)=>{
+    const owned=save.unlocked.includes(id),reward=CONFIG.sorpresas.find(x=>x.id===id);
+    const item=document.createElement('article');item.className='surprise-item'+(owned?' unlocked':'');
+    const symbol=document.createElement('span');symbol.className='surprise-icon';symbol.textContent=owned?reward.icono:'🔒';
+    const heading=document.createElement('h3');heading.textContent=owned?reward.titulo:`SORPRESA N.º ${String(index+1).padStart(2,'0')}`;
+    const note=document.createElement('p');note.textContent=owned?'¡Recompensa ganada! Ábrela para leer tu premio.':'Secreta hasta que ganes una partida.';
+    const b=document.createElement('button');b.type='button';b.textContent=owned?'VER SORPRESA ♥':'DESBLOQUEAR →';
+    b.setAttribute('aria-label',owned?`Ver ${reward.titulo}`:`Desbloquear sorpresa ${index+1} jugando`);
+    b.addEventListener('click',()=>owned?showReward(id):openLockedIntro(id));
+    item.append(symbol,heading,note,b);$('surpriseGrid').appendChild(item);
+  });
+}
+let selectedReward=null;
+function showReward(id){
+  if(!save.unlocked.includes(id))return;
+  const reward=CONFIG.sorpresas.find(s=>s.id===id);if(!reward)return;
+  selectedReward=id;
+  $('rewardIcon').textContent=reward.icono;
+  $('rewardNumber').textContent=`SORPRESA ${String(save.order.indexOf(id)+1).padStart(2,'0')} / 15`;
+  $('rewardTitle').textContent=reward.titulo;
+  $('rewardText').textContent=reward.texto;
+  go('surpriseDetailScreen');confetti(20);
+}
+async function copyReward(){
+  const reward=CONFIG.sorpresas.find(s=>s.id===selectedReward);if(!reward)return;
+  const text=`🎁 ${reward.titulo}\n${reward.texto}\n♥ Un universo para ti`;
+  try{await navigator.clipboard.writeText(text);showToast('¡Tu sorpresa quedó copiada!');}
+  catch(_){showToast('Puedes tomar una captura de pantalla de tu premio.');}
+}
+function askErase(){
+  showDialog({title:'¿BORRAR TU COLECCIÓN?',text:'Esto eliminará en ESTE navegador las victorias y las sorpresas desbloqueadas. No se puede deshacer.',icon:'⚠',actionLabel:'SÍ, BORRAR',cancelLabel:'CANCELAR',onContinue:()=>{
+    save=newSave();targetedRewardId=null;persist();updateHome();go('home');showToast('El progreso de este navegador se ha reiniciado.');
+  }});
+}
+function home(){go('home');}
+
+const notes=[523.25,659.25,783.99,659.25,587.33,698.46,880,698.46,523.25,659.25,783.99,1046.5,880,783.99,659.25,587.33];
+function sound(freq,dur=.19,gain=.02,type='sine'){
+  if(!musicOn)return;
+  try{
+    audioCtx??=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const osc=audioCtx.createOscillator(),vol=audioCtx.createGain(),now=audioCtx.currentTime;
+    osc.type=type;osc.frequency.value=freq;vol.gain.setValueAtTime(.0001,now);
+    vol.gain.exponentialRampToValueAtTime(gain,now+.016);vol.gain.exponentialRampToValueAtTime(.0001,now+dur);
+    osc.connect(vol);vol.connect(audioCtx.destination);osc.start(now);osc.stop(now+dur+.01);
+  }catch(_){/* La experiencia funciona también sin sonido */}
+}
+function playSfx(which){if(!musicOn)return; if(which==='win'){sound(784,.18,.03,'triangle');setTimeout(()=>sound(1046.5,.24,.03,'triangle'),120);}else if(which==='hint')sound(1046.5,.34,.028);else sound(659,.09,.016);}
+function toggleSound(){
+  musicOn=!musicOn;$('soundBtn').textContent=musicOn?'♫':'♪̸';
+  $('soundBtn').setAttribute('aria-label',musicOn?'Desactivar música':'Activar música');
+  if(musicOn){
+    sound(523.25,.21);musicTimer=setInterval(()=>{sound(notes[musicStep%notes.length],.29,.012,'triangle');musicStep++;},390);
+  }else{clearInterval(musicTimer);musicTimer=null;}
+}
+// Paisaje original de píxeles: se dibuja localmente (sin imágenes externas).
+const cvs=$('world'),ctx=cvs.getContext('2d',{alpha:false});
+let W=0,H=0,frame=0,stars=[];
+function rng(seed){let t=seed>>>0;return ()=>{t=(t*1664525+1013904223)>>>0;return t/4294967296;};}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));}
+function polygon(pts,color){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));ctx.closePath();ctx.fill();}
+function cloud(x,y,s,c){
+  rect(x+6*s,y,23*s,3*s,c);rect(x+1*s,y+3*s,37*s,5*s,c);
+  rect(x-5*s,y+8*s,46*s,5*s,c);rect(x+3*s,y+13*s,32*s,3*s,c);
+}
+function mountain(y,amp,wave,c,offset=0){
+  const points=[[0,H]];for(let x=0;x<=W+8;x+=5){let yy=y+Math.sin((x+offset)*wave)*amp+Math.sin((x+offset)*wave*.33)*amp*.55;points.push([x,Math.round(yy/3)*3]);}points.push([W,H]);polygon(points,c);
+}
+function landscape(){
+  const r=rng(7465),sky=['#b856bb','#c45abd','#d164bd','#d66dbd','#e27abd','#e985ba','#ee90b7','#f099b7','#f3a6ad','#f6b4a6','#ffbea6','#fbcba6'];
+  for(let i=0;i<sky.length;i++)rect(0,i*H*.067,W,H*.068,sky[i]);
+  rect(0,H*.77,W,H*.23,'#a25ea7');
+  // Pixel sun and halo above distant horizon.
+  const cx=W*.53,cy=H*.43,rad=Math.min(W*.13,H*.18);
+  for(let step=rad+9;step>rad;step-=3){ctx.globalAlpha=.045;const d=Math.sqrt(Math.max(0,(rad+9)**2-(step-rad)**2));rect(cx-d,cy-rad*.75-(step-rad),2*d,2*(rad*.75+(step-rad)),'#fff1a7');}
+  ctx.globalAlpha=1;
+  for(let dy=-rad;dy<=rad;dy+=2){let dx=Math.sqrt(Math.max(0,rad*rad-dy*dy));rect(cx-dx,cy+dy,dx*2,2,dy>rad*.54?'#ffd3a1':'#ffe5b2');}
+  for(let i=0;i<27;i++){
+    let x=r()*W,y=r()*H*.48,s=1+r()*1.6;
+    cloud(x,y,s,y>H*.32?'#f7a6bd':(r()>.5?'#f49bc4':'#d979c0'));
+  }
+  // Faint distance layers.
+  mountain(H*.56,H*.08,.028,'#ad65bf',-93);
+  mountain(H*.61,H*.09,.042,'#944bba',85);
+  mountain(H*.69,H*.10,.052,'#813cae',-23);
+  // Cliffs in stepped terraces on both sides of the waterfalls.
+  polygon([[0,H*.49],[W*.17,H*.49],[W*.23,H*.57],[W*.34,H*.57],[W*.36,H*.63],[W*.44,H*.63],[W*.43,H*.88],[0,H*.88]],'#6e2c9a');
+  polygon([[W,H*.45],[W*.84,H*.45],[W*.79,H*.55],[W*.66,H*.55],[W*.64,H*.64],[W*.58,H*.64],[W*.58,H*.88],[W,H*.88]],'#6a278e');
+  // Tier texture with small, scattered blocks.
+  for(let i=0;i<340;i++){
+    let x=r()*W,y=H*(.5+r()*.38);
+    const left=x<W*.41&&y>H*(.49+(x/W)*.30);
+    const right=x>W*.6&&y>H*(.48+(1-x/W)*.30);
+    if(left||right)rect(x,y,3+r()*7,1+r()*5,['#9942b7','#8532a7','#b453b6','#5a2187'][Math.floor(r()*4)]);
+  }
+  // Five vertical streams, alternating rose and lavender.
+  for(let j=0;j<5;j++){
+    const xx=W*(.44+j*.027);rect(xx,H*.61,W*.011,H*.22,j%2?'#f3a6d5':'#ffc5e3');
+    for(let k=0;k<6;k++)rect(xx+1,H*(.64+k*.027),W*.006,H*.009,'#ffe4ec');
+  }
+  // Pool of water and sunset reflections in the river.
+  polygon([[W*.38,H*.81],[W*.64,H*.81],[W*.74,H],[W*.26,H]],'#a254ab');
+  for(let j=0;j<62;j++){
+    const y=H*(.82+r()*.18),span=(y/H-.79)*W*1.7,x=cx+(r()-.5)*span;
+    rect(x,y,4+r()*19,1+r()*3,['#f3a1c9','#feadd3','#ffd0bc','#d57bcd'][Math.floor(r()*4)]);
+  }
+  // Foreground fields and angular flowers.
+  polygon([[0,H*.82],[W*.20,H*.82],[W*.30,H],[0,H]],'#4b227f');
+  polygon([[W,H*.78],[W*.84,H*.81],[W*.72,H],[W,H]],'#51217d');
+  for(let i=0;i<125;i++){
+    const x=r()*W,y=H*(.80+r()*.20);
+    if((x<W*.28)||(x>W*.76)){rect(x,y,2+r()*5,2+r()*5,['#733092','#8e329f','#c94fa9','#e755ac','#ff7ab8'][Math.floor(r()*5)]);}
+  }
+  for(let i=0;i<18;i++){
+    const x=(r()*.28+(r()>.5?.73:0))*W,y=H*(.84+r()*.16);
+    rect(x,y-6,2,9,'#4d2b7f');rect(x-3,y-8,8,4,r()>.5?'#ec5eaf':'#f88cd3');rect(x,y-10,2,3,'#ffc5e2');
+  }
+  // Pixelated star dust positions used in animated layer.
+  stars=Array.from({length:55},()=>({x:r()*W,y:r()*H*.49,phase:r()*6.3,size:r()>.87?2:1}));
+}
+function resizeScene(){
+  const ratio=Math.max(3,Math.min(5,Math.round(window.innerWidth/320)*2+2));
+  W=Math.ceil(window.innerWidth/ratio);H=Math.ceil(window.innerHeight/ratio);
+  cvs.width=W;cvs.height=H;ctx.imageSmoothingEnabled=false;
+  landscape();
+  // Retain the static painted landscape separately.
+  staticScene=document.createElement('canvas');staticScene.width=W;staticScene.height=H;
+  staticScene.getContext('2d').drawImage(cvs,0,0);
+}
+let staticScene;
+function animateScene(){
+  frame++;
+  if(staticScene){ctx.drawImage(staticScene,0,0);stars.forEach((p,i)=>{
+    const a=.22+.6*(Math.sin(frame*.035+p.phase)+1)/2;
+    if(a>.52)rect(p.x,p.y,p.size,p.size,a>.81?'#fff5dc':'#ffd6ec');
+  });
+  const y=H*.83+(frame%53)*.11;
+  for(let i=0;i<14;i++){
+    const x=W*(.42+(i%7)*.025)+Math.sin(frame*.03+i)*2;
+    rect(x,y+(i%3)*6,4,1,'#ffdbdf');
+  }}
+  requestAnimationFrame(animateScene);
+}
+let resizeTimeout;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(resizeScene,110);});
+
+
+function confetti(n=25){
+  if(reduceMotion)return;
+  for(let i=0;i<n;i++){
+    const el=document.createElement('span');el.className='particle';
+    el.textContent=['♥','✦','✧','★'][Math.floor(Math.random()*4)];
+    el.style.left=Math.random()*100+'%';el.style.color=['#ffb7d9','#fff6ae','#c4faff','#ff7fb1'][Math.floor(Math.random()*4)];
+    el.style.setProperty('--size',(16+Math.random()*18)+'px');
+    el.style.setProperty('--fall',(2.1+Math.random()*2.1)+'s');
+    el.style.setProperty('--dx',(-110+Math.random()*220)+'px');
+    el.style.setProperty('--spin',(-360+Math.random()*720)+'deg');
+    $('particles').appendChild(el);setTimeout(()=>el.remove(),4600);
+  }
+}
+$('openLetter').addEventListener('click',()=>{playSfx('tap');page=0;go('letterScreen');});
+$('openGame').addEventListener('click',openGameIntro);
+$('openPrize').addEventListener('click',openCollection);
+$('letterNext').addEventListener('click',()=>{
+  playSfx('tap');
+  if(letterTyping){finishLetter();return;}
+  if(page<CONFIG.paginasCarta.length-1){page++;renderLetter();}
+  else openGameIntro();
+});
+$('letterBack').addEventListener('click',()=>{
+  playSfx('tap');if(page>0){page--;renderLetter();}else home();
+});
+$('gamesBack').addEventListener('click',home);
+$('gamesCollection').addEventListener('click',openCollection);
+$('playBack').addEventListener('click',()=>go('gameSelectScreen'));
+$('playRestart').addEventListener('click',()=>startGame(activeGame));
+$('surprisesBack').addEventListener('click',home);
+$('surprisesPlay').addEventListener('click',openGameIntro);
+$('rewardBack').addEventListener('click',()=>go('surprisesScreen'));
+$('rewardCopy').addEventListener('click',copyReward);
+$('clearProgress').addEventListener('click',askErase);
+$('dialogOk').addEventListener('click',closeDialog);
+$('dialogCancel').addEventListener('click',dismissDialog);
+$('resetBtn').setAttribute('aria-label','Volver al inicio sin perder el progreso');
+$('resetBtn').setAttribute('title','Volver al inicio sin borrar el progreso');
+$('resetBtn').addEventListener('click',home);
+$('soundBtn').addEventListener('click',toggleSound);
+window.addEventListener('keydown',e=>{
+  if(!$('dialog').hidden){
+    if(e.key==='Escape'){e.preventDefault();dismissDialog();}
+    if(e.key==='Tab'){
+      const focusables=[$('dialogCancel'),$('dialogOk')].filter(n=>!n.hidden);
+      if(focusables.length){const at=focusables.indexOf(document.activeElement);if(e.shiftKey&&at<=0){e.preventDefault();focusables.at(-1).focus();}else if(!e.shiftKey&&at===focusables.length-1){e.preventDefault();focusables[0].focus();}}
+    }
+    return;
+  }
+  if(current==='playScreen'&&activeGame==='laberinto'){
+    const map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1],w:[-1,0],s:[1,0],a:[0,-1],d:[0,1]};
+    const move=map[e.key];if(move){e.preventDefault();moveMaze(...move);return;}
+  }
+  if(e.key==='Escape'&&current!=='home')home();
+});
+initialize();resizeScene();animateScene();
+
+</script>
+</body>
+</html>
